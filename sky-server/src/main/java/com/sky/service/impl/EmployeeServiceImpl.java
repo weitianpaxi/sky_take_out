@@ -9,6 +9,7 @@ import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
@@ -134,6 +135,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeMapper.update(employee);
     }
 
+    /**
+     * 根据ID获取员工信息
+     * @param id
+     * @return com.sky.entity.Employee
+     * @author paxi
+     * @data 2023/8/22
+     **/
     @Override
     public Employee getById(long id) {
         Employee employee = employeeMapper.getById(id);
@@ -141,6 +149,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
+    /**
+     * 编辑员工信息
+     * @param employeeDTO
+     * @return void
+     * @author paxi
+     * @data 2023/8/22
+     **/
     @Override
     public void update(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
@@ -151,6 +166,37 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setUpdateTime(LocalDateTime.now());
         employee.setUpdateUser(BaseContext.getCurrentId());
 
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * 修改密码
+     * @param passwordEditDTO
+     * @return void
+     * @author paxi
+     * @data 2023/8/22
+     **/
+    @Override
+    public void updatePassword(PasswordEditDTO passwordEditDTO) {
+        passwordEditDTO.setEmpId(BaseContext.getCurrentId());
+        String password = passwordEditDTO.getOldPassword();
+        Employee employee = employeeMapper.getById(passwordEditDTO.getEmpId());
+
+        // 异常处理
+        if (employee == null) {
+            //账号不存在
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+        // 旧密码比对
+        password = DigestUtils.md5DigestAsHex(password.getBytes());
+        if (!password.equals(employee.getPassword())) {
+            // 旧密码输入错误
+            throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
+        }
+
+        // 新密码加密存储
+        employee.setPassword(DigestUtils.md5DigestAsHex(passwordEditDTO.getNewPassword().getBytes()));
+        // 更新密码
         employeeMapper.update(employee);
     }
 
