@@ -1,6 +1,7 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.constant.MessageConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
@@ -92,7 +93,7 @@ public class EmployeeController {
         if (employeeService.save(employeeDTO)) {
             return Result.success();
         } else {
-            return Result.error("新增失败");
+            return Result.error(MessageConstant.SAVE_USER_ERROR);
         }
     }
 
