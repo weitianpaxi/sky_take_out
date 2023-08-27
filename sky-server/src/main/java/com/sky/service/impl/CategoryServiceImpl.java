@@ -118,4 +118,16 @@ public class CategoryServiceImpl implements CategoryService {
             throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_SETMEAL);
         return categoryMapper.deleteById(id) > 0;
     }
+
+    /**
+     * 根据类型查询分类
+     * @param type
+     * @return java.util.List<com.sky.entity.Category>
+     * @author paxi
+     * @data 2023/8/27
+     **/
+    @Override
+    public List<Category> getByType(Integer type) {
+        return categoryMapper.list(type);
+    }
 }

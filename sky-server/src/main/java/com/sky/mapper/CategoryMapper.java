@@ -10,6 +10,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface CategoryMapper {
 
@@ -55,4 +57,13 @@ public interface CategoryMapper {
      **/
     @Delete("delete from sky_take_out.category where id = #{id}")
     int deleteById(long id);
+
+    /**
+     * 根据类型查询分类
+     * @param type
+     * @return java.util.List<com.sky.entity.Category>
+     * @author paxi
+     * @data 2023/8/27
+     **/
+    List<Category> list(Integer type);
 }

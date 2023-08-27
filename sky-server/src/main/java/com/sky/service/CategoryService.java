@@ -2,7 +2,10 @@ package com.sky.service;
 
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
+import com.sky.entity.Category;
 import com.sky.result.PageResult;
+
+import java.util.List;
 
 public interface CategoryService {
 
@@ -51,4 +54,13 @@ public interface CategoryService {
      * @data 2023/8/26
      **/
     boolean deleteById(long id);
+
+    /**
+     * 根据类型查询分类
+     * @param type
+     * @return java.util.List<com.sky.entity.Category>
+     * @author paxi
+     * @data 2023/8/27
+     **/
+    List<Category> getByType(Integer type);
 }

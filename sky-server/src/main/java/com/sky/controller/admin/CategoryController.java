@@ -3,13 +3,17 @@ package com.sky.controller.admin;
 import com.sky.constant.MessageConstant;
 import com.sky.dto.CategoryDTO;
 import com.sky.dto.CategoryPageQueryDTO;
+import com.sky.entity.Category;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.CategoryService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 菜品分类管理
@@ -18,8 +22,8 @@ import org.springframework.web.bind.annotation.*;
  **/
 @RestController
 @RequestMapping("/admin/category")
+@Api(tags = "分类操作相关接口")
 @Slf4j
-@ApiOperation(value = "分类操作相关接口")
 public class CategoryController {
 
     @Autowired
@@ -76,6 +80,13 @@ public class CategoryController {
             return Result.error(MessageConstant.UPDATE_CATEGORY_ERROR);
     }
 
+    /**
+     * 分类分页查询
+     * @param categoryPageQueryDTO
+     * @return com.sky.result.Result<com.sky.result.PageResult>
+     * @author paxi
+     * @data 2023/8/27
+     **/
     @GetMapping("/page")
     @ApiOperation(value = "分类分页查询")
     public Result<PageResult> pageQuery(CategoryPageQueryDTO categoryPageQueryDTO) {
@@ -84,6 +95,13 @@ public class CategoryController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 根据ID删除分类
+     * @param id
+     * @return com.sky.result.Result<java.lang.String>
+     * @author paxi
+     * @data 2023/8/27
+     **/
     @DeleteMapping
     @ApiOperation(value = "根据ID删除分类")
     public Result<String> deleteById(long id) {
@@ -92,5 +110,19 @@ public class CategoryController {
             return Result.success();
         else
             return Result.error(MessageConstant.DELETE_CATEGORY_ERROR);
+    }
+
+    /**
+     * 根据类型查询分类
+     * @param type
+     * @return com.sky.result.Result<java.util.List<com.sky.entity.Category>>
+     * @author paxi
+     * @data 2023/8/27
+     **/
+    @GetMapping("/list")
+    @ApiOperation(value = "根据类型查询分类")
+    public Result<List<Category>> getByType(Integer type) {
+        List<Category> categoryList = categoryService.getByType(type);
+        return Result.success(categoryList);
     }
 }
