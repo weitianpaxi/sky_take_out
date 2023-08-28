@@ -4,7 +4,7 @@
     <insert id="insertBatch">
         insert into sky_take_out.dish_flavor(dish_id, name, value)
         values
-            <foreach collection="dishFlavorList" item="dishFlavor">
+            <foreach collection="dishFlavorList" item="dishFlavor" separator=",">
                 (#{dishFlavor.dishId},#{dishFlavor.name},#{dishFlavor.value})
             </foreach>
     </insert>
