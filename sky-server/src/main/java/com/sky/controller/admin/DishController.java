@@ -1,16 +1,17 @@
 package com.sky.controller.admin;
 
 import com.sky.dto.DishDTO;
+import com.sky.dto.DishPageQueryDTO;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 菜品管理
@@ -38,6 +39,36 @@ public class DishController {
     public Result<String> save(@RequestBody DishDTO dishDTO) {
         log.info("新增菜品：{}",dishDTO);
         dishService.saveWithFlavor(dishDTO);
+        return Result.success();
+    }
+
+    /**
+     * 菜品分页查询
+     * @param dishPageQueryDTO
+     * @return com.sky.result.Result<com.sky.result.PageResult>
+     * @author paxi
+     * @data 2023/8/28
+     **/
+    @GetMapping("/page")
+    @ApiOperation(value = "菜品分页查询")
+    public Result<PageResult> pageQuery(DishPageQueryDTO dishPageQueryDTO) {
+        log.info("菜品分页查询：{}",dishPageQueryDTO);
+        PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
+        return Result.success(pageResult);
+    }
+
+    /**
+     * 根据ID批量删除菜品
+     * @param ids 添加@RequestParam 注解可以将传入的按都好分割的字符串解析后存入List中
+     * @return com.sky.result.Result
+     * @author paxi
+     * @data 2023/8/28
+     **/
+    @DeleteMapping
+    @ApiOperation(value = "根据ID批量删除菜品")
+    public Result deleteDishByIds(@RequestParam List<Long> ids) {
+        log.info("菜品批量删除的ID：{}",ids);
+        dishService.deleteByIds(ids);
         return Result.success();
     }
 }
