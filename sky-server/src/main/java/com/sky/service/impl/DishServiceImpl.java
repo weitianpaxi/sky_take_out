@@ -2,12 +2,14 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.annotation.AutoFill;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.enumeration.OperationType;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
@@ -111,5 +113,86 @@ public class DishServiceImpl implements DishService {
             // 删除菜品关联的口味数据
             dishFlavorMapper.deleteByDishId(id);
         }
+    }
+
+    /**
+     * 根据ID查询菜品和对应的口味信息
+     * @param id
+     * @return com.sky.vo.DishVO
+     * @author paxi
+     * @data 2023/8/29
+     **/
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+        // 根据菜品ID查询菜品数据
+        Dish dish = dishMapper.getById(id);
+
+        // 根据菜品ID查询口味数据
+        List<DishFlavor> dishFlavorList = dishFlavorMapper.getByDishId(id);
+
+        // 将查询到的数据封装到DishVO
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish,dishVO);
+        dishVO.setFlavors(dishFlavorList);
+
+        return dishVO;
+    }
+
+    /**
+     * 修改菜品基本信息以及相对应的口味信息
+     * @param dishDTO
+     * @return void
+     * @author paxi
+     * @data 2023/8/29
+     **/
+    @Override
+    @Transactional
+    public void updateWithFlavor(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+        // 修改菜品表基本信息
+        dishMapper.update(dish);
+        // 删除原来的口味信息
+        dishFlavorMapper.deleteByDishId(dishDTO.getId());
+        // 将新的口味信息重新新增
+        List<DishFlavor> dishFlavorList = dishDTO.getFlavors();
+        if (dishFlavorList != null && !dishFlavorList.isEmpty()) {
+            dishFlavorList.forEach(dishFlavor -> {
+                // 遍历列表给菜品ID赋值
+                dishFlavor.setDishId(dishDTO.getId());
+            });
+            // 向口味表插入数据
+            dishFlavorMapper.insertBatch(dishFlavorList);
+        }
+    }
+
+    /**
+     * 启售，停售菜品
+     * @param id
+     * @param status
+     * @return void
+     * @author paxi
+     * @data 2023/8/29
+     **/
+    @Override
+    public void startAndStop(Long id, Integer status) {
+        Dish dish = Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+        dishMapper.update(dish);
+    }
+
+    /**
+     * 根据分类id查询菜品
+     *
+     * @param categoryId
+     * @return java.util.List<com.sky.entity.Dish>
+     * @author paxi
+     * @data 2023/8/29
+     **/
+    @Override
+    public List<Dish> getByCategoryId(Integer categoryId) {
+        return dishMapper.getByCategoryId(categoryId);
     }
 }
