@@ -87,4 +87,14 @@ public interface DishMapper {
      * @data 2023/8/29
      **/
     List<Dish> getByCategoryId(Integer categoryId);
+
+    /**
+     * 根据套餐ID查询菜品信息
+     * @param setmealId
+     * @return java.util.List<com.sky.entity.Dish>
+     * @author paxi
+     * @data 2023/9/3
+     **/
+    @Select("select d.* from setmeal_dish sd left join dish d on sd.dish_id = d.id where sd.setmeal_id = #{setmealId}")
+    List<Dish> getBySetmealId(Long setmealId);
 }
