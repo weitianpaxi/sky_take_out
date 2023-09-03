@@ -166,17 +166,17 @@ public class SetmealServiceImpl implements SetmealService {
      **/
     @Override
     public void deleteByIds(List<Long> ids) {
-        ids.forEach(id -> {
-            Setmeal setmeal = setmealMapper.getById(id);
+        ids.forEach(setmealId -> {
+            Setmeal setmeal = setmealMapper.getById(setmealId);
             // 起售中的套餐无法删除
             if (StatusConstant.ENABLE.equals(setmeal.getStatus()))
                 throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ON_SALE);
-        });
-        ids.forEach(setmealId -> {
-            // 删除套餐信息
-            setmealMapper.deleteById(setmealId);
-            // 删除套菜对应菜品信息
-            setmealDishMapper.deleteBySetmealId(setmealId);
+            else {
+                // 删除套餐信息
+                setmealMapper.deleteById(setmealId);
+                // 删除套菜对应菜品信息
+                setmealDishMapper.deleteBySetmealId(setmealId);
+            }
         });
     }
 }
