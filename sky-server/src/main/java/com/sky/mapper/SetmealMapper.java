@@ -75,6 +75,6 @@ public interface SetmealMapper {
      * @author paxi
      * @data 2023/9/3
      **/
-    @Delete("delete from dish where id = #{id}")
+    @Delete("delete from setmeal where id = #{id}")
     void deleteById(Long id);
 }

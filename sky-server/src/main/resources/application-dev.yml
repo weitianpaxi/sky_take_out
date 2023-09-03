@@ -11,3 +11,7 @@ sky:
     access-key-id: LTAI5t8dQ6aXSmikanzJ6Pm3
     access-key-secret: X3woXKhFO6DxVVIt3ZCMoQZiuy8Vb1
     bucket-name: yun-weitianshu-top
+  redis:
+    host: localhost
+    port: 6379
+    database: 9
