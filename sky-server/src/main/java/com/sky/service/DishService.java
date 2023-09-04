@@ -72,4 +72,13 @@ public interface DishService {
      * @data 2023/8/29
      **/
     List<Dish> getByCategoryId(Integer categoryId);
+
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return java.util.List<com.sky.vo.DishVO>
+     * @author paxi
+     * @data 2023/9/4
+     **/
+    List<DishVO> listWithFlavor(Dish dish);
 }
