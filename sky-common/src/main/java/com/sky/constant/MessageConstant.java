@@ -29,5 +29,6 @@ public class MessageConstant {
     public static final String START_AND_STOP_CATEGORY_ERROR = "启用，禁用分类失败";
     public static final String UPDATE_CATEGORY_ERROR = "修改分类失败";
     public static final String DELETE_CATEGORY_ERROR = "删除分类失败";
+    public static final String NO_DEFAULT_ADDRESS = "没有查询到默认地址";
 
 }
