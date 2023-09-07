@@ -25,4 +25,14 @@ public interface UserMapper {
      * @data 2023/9/4
      **/
     User save(User user);
+
+    /**
+     * 根据ID查询用户
+     * @param userId
+     * @return com.sky.entity.User
+     * @author paxi
+     * @data 2023/9/7
+     **/
+    @Select("select * from user where id = #{userId}")
+    User getById(Long userId);
 }

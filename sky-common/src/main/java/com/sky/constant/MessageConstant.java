@@ -30,5 +30,7 @@ public class MessageConstant {
     public static final String UPDATE_CATEGORY_ERROR = "修改分类失败";
     public static final String DELETE_CATEGORY_ERROR = "删除分类失败";
     public static final String NO_DEFAULT_ADDRESS = "没有查询到默认地址";
+    public static final String ORDER_PAID = "该订单已支付";
+    public static final String CANCEL_REASON = "用户自助取消";
 
 }

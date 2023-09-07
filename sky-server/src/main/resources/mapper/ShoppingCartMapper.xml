@@ -23,4 +23,13 @@
         VALUES
             (#{name},#{image},#{userId},#{dishId},#{setmealId},#{dishFlavor},#{number},#{amount},#{createTime})
     </insert>
+    <insert id="insertList">
+        insert into shopping_cart(name, image, user_id, dish_id, setmeal_id, dish_flavor, number, amount, create_time)
+        VALUES
+            <foreach collection="shoppingCartList" item="shoppingCart" separator=",">
+                (#{shoppingCart.name},#{shoppingCart.image},#{shoppingCart.userId},
+                 #{shoppingCart.dishId},#{shoppingCart.setmealId},#{shoppingCart.dishFlavor},
+                 #{shoppingCart.number},#{shoppingCart.amount},#{shoppingCart.createTime})
+            </foreach>
+    </insert>
 </mapper>
