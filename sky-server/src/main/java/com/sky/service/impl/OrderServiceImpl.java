@@ -1,14 +1,12 @@
 package com.sky.service.impl;
 
-import com.alibaba.fastjson.JSON;
+
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.*;
 import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
@@ -18,20 +16,20 @@ import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -320,5 +318,203 @@ public class OrderServiceImpl implements OrderService {
         orders.setCancelReason(MessageConstant.CANCEL_REASON);
         orders.setCancelTime(LocalDateTime.now());
         ordersMapper.update(orders);
+    }
+
+    /**
+     * 商家接单
+     * @param ordersConfirmDTO
+     * @return void
+     * @author paxi
+     * @data 2023/9/8
+     **/
+    @Override
+    public void confirmOrders(OrdersConfirmDTO ordersConfirmDTO) {
+        Orders orders = Orders.builder()
+                .id(ordersConfirmDTO.getId())
+                .status(Orders.CONFIRMED)
+                .build();
+        ordersMapper.update(orders);
+    }
+
+    /**
+     * 商家拒单
+     * @param ordersRejectionDTO
+     * @return void
+     * @author paxi
+     * @data 2023/9/8
+     **/
+    @Override
+    public void rejectOrders(OrdersRejectionDTO ordersRejectionDTO) {
+        Orders ordersDatabase = ordersMapper.getById(ordersRejectionDTO.getId());
+
+        // 只有待接单才可以拒单
+        if (ordersDatabase == null || Objects.equals(ordersDatabase.getStatus(), Orders.TO_BE_CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        // 判断用户支付状态
+        Integer payStatus = ordersDatabase.getPayStatus();
+        if (Objects.equals(payStatus, Orders.PAID)) {
+            // 此时用户已经支付成功，需要调用微信支付接口退款，此项目省略
+            log.info("商家拒单退款");
+        }
+        // 更新订单状态，注明订单被拒绝的原因和时间
+        Orders orders = Orders.builder()
+                .id(ordersDatabase.getId())
+                .status(Orders.CANCELLED)
+                .rejectionReason(ordersRejectionDTO.getRejectionReason())
+                .cancelTime(LocalDateTime.now())
+                .build();
+        ordersMapper.update(orders);
+    }
+
+    /**
+     * 商家派送订单
+     * @param orderId
+     * @return void
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    @Override
+    public void deliveryOrders(Integer orderId) {
+        Orders ordersDatabase = ordersMapper.getById(Long.valueOf(orderId));
+
+        // 订单只有接单了才可以派送，并且订单需要保证存在
+        if (ordersDatabase == null || !Objects.equals(ordersDatabase.getStatus(), Orders.CONFIRMED)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        // 更新订单状态为派送中
+        Orders orders = new Orders();
+        orders.setId(ordersDatabase.getId());
+        orders.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        ordersMapper.update(orders);
+    }
+
+    /**
+     * 商家完成订单
+     * @param orderId
+     * @return void
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    @Override
+    public void completeOrders(Long orderId) {
+        Orders ordersDatabase = ordersMapper.getById(orderId);
+
+        // 订单只有派送了才可以完成，并且订单需要保证存在
+        if (ordersDatabase == null || !Objects.equals(ordersDatabase.getStatus(), Orders.DELIVERY_IN_PROGRESS)) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        // 更新订单状态为派送中
+        Orders orders = new Orders();
+        orders.setId(ordersDatabase.getId());
+        orders.setStatus(Orders.COMPLETED);
+        ordersMapper.update(orders);
+    }
+
+    /**
+     * 商家取消订单
+     * @param ordersCancelDTO
+     * @return void
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    @Override
+    public void cancelOrders(OrdersCancelDTO ordersCancelDTO) {
+        Orders ordersDatabase = ordersMapper.getById(ordersCancelDTO.getId());
+        // 判断用户支付状态
+        Integer payStatus = ordersDatabase.getPayStatus();
+        if (Objects.equals(payStatus, Orders.PAID)) {
+            // 此时用户已经支付成功，需要调用微信支付接口退款，此项目省略
+            log.info("商家取消订单退款");
+        }
+        // 更新订单状态，注明订单被取消的原因和时间
+        Orders orders = Orders.builder()
+                .id(ordersDatabase.getId())
+                .status(Orders.CANCELLED)
+                .rejectionReason(ordersCancelDTO.getCancelReason())
+                .cancelTime(LocalDateTime.now())
+                .build();
+        ordersMapper.update(orders);
+    }
+
+    /**
+     * 订单状态查询与统计
+     * @return com.sky.vo.OrderStatisticsVO
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    @Override
+    public OrderStatisticsVO getOrderStatus() {
+        OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
+        orderStatisticsVO.setConfirmed(ordersMapper.countByStatus(Orders.CONFIRMED));
+        orderStatisticsVO.setToBeConfirmed(ordersMapper.countByStatus(Orders.TO_BE_CONFIRMED));
+        orderStatisticsVO.setDeliveryInProgress(ordersMapper.countByStatus(Orders.DELIVERY_IN_PROGRESS));
+        return orderStatisticsVO;
+    }
+
+    /**
+     * 订单多条件分页查询
+     * @param ordersPageQueryDTO
+     * @return com.sky.result.PageResult
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    @Override
+    public PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO) {
+        // 返回数据包含有订单全部信息，以及订单包含的菜品信息，以字符串形式展示
+        // 开始分页查询
+        PageHelper.startPage(ordersPageQueryDTO.getPage(),ordersPageQueryDTO.getPageSize());
+        Page<Orders> ordersPage = ordersMapper.pageQuery(ordersPageQueryDTO);
+
+        // 对于包含的菜品信息，需要再次查询展示，依托ordersVO对象，即返回数据中的是ordersVO的列表
+        List<OrderVO> orderVOList = getOrdersVOList(ordersPage);
+
+        return new PageResult(ordersPage.getTotal(),orderVOList);
+    }
+
+    /**
+     * 获取订单详细信息的展示对象列表
+     * @param ordersPage
+     * @return java.util.List<com.sky.vo.OrderVO>
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    private List<OrderVO> getOrdersVOList(Page<Orders> ordersPage) {
+        ArrayList<OrderVO> orderVOArrayList = new ArrayList<>();
+        // 拿到分页查询的结果，订单列表
+        List<Orders> ordersList = ordersPage.getResult();
+        if (!ordersList.isEmpty()) {
+            ordersList.forEach(orders -> {
+                // 给orderVO对象赋值
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(orders,orderVO);
+                // 设置菜品信息,为字符串
+                orderVO.setOrderDishes(getDishesStr(orders));
+                orderVOArrayList.add(orderVO);
+            });
+        }
+        return orderVOArrayList;
+    }
+
+    /**
+     * 获取订单中的菜品信息并转换为字符串形式
+     * @param orders
+     * @return java.lang.String
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    private String getDishesStr(Orders orders) {
+        // 通过订单ID查询其所包含的菜品信息
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
+
+        ArrayList<String> dishesArrayList = new ArrayList<>();
+        orderDetailList.forEach(orderDetail -> {
+            // 设置菜皮信息字符串，格式：菜品名称*数量
+            String dishesTempStr = orderDetail.getName() + "*" + orderDetail.getNumber() + ";";
+            dishesArrayList.add(dishesTempStr);
+        });
+        return String.join("",dishesArrayList);
     }
 }

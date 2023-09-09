@@ -55,4 +55,14 @@ public interface OrdersMapper {
      * @data 2023/9/7
      **/
     Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    /**
+     * 统计不同状态的订单数
+     * @param status
+     * @return java.lang.Integer
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    @Select("select count(id) from orders where status = #{status}")
+    Integer countByStatus(Integer status);
 }

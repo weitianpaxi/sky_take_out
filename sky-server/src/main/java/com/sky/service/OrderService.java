@@ -1,9 +1,9 @@
 package com.sky.service;
 
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.result.PageResult;
 import com.sky.vo.OrderPaymentVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 
@@ -73,4 +73,66 @@ public interface OrderService {
      * @data 2023/9/7
      **/
     void userCancelByOrderId(Long orderId);
+
+    /**
+     * 商家接单
+     * @param ordersConfirmDTO
+     * @return void
+     * @author paxi
+     * @data 2023/9/8
+     **/
+    void confirmOrders(OrdersConfirmDTO ordersConfirmDTO);
+
+    /**
+     * 商家拒单
+     * @param ordersRejectionDTO
+     * @return void
+     * @author paxi
+     * @data 2023/9/8
+     **/
+    void rejectOrders(OrdersRejectionDTO ordersRejectionDTO);
+
+    /**
+     * 商家派送订单
+     * @param orderId
+     * @return void
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    void deliveryOrders(Integer orderId);
+
+    /**
+     * 商家完成订单
+     * @param orderId
+     * @return void
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    void completeOrders(Long orderId);
+
+    /**
+     * 商家取消订单
+     * @param ordersCancelDTO
+     * @return void
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    void cancelOrders(OrdersCancelDTO ordersCancelDTO);
+
+    /**
+     * 订单状态查询与统计
+     * @return com.sky.vo.OrderStatisticsVO
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    OrderStatisticsVO getOrderStatus();
+
+    /**
+     * 订单多条件分页查询
+     * @param ordersPageQueryDTO
+     * @return com.sky.result.PageResult
+     * @author paxi
+     * @data 2023/9/9
+     **/
+    PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO);
 }
