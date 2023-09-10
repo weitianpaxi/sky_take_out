@@ -18,3 +18,9 @@ sky:
   wechat:
     appid: wx4261557cb5708f86
     secret: a97ce4d088aae190f01d341ecb5c4746
+  baidumap:
+    ak: LzGGnZsC4fHm4qz5Be3eL3b5Ia8Mujng
+    webservice_geocoding_url: https://api.map.baidu.com/geocoding/v3
+    webservice_-direction-lite_url: https://api.map.baidu.com/directionlite/v1/riding
+  shop:
+    address: 陕西省西安市雁塔区小寨东路196号西安国际贸易中心1层

@@ -1,6 +1,8 @@
 package com.sky.service.impl;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -12,8 +14,11 @@ import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
+import com.sky.properties.BaiduMapProperties;
+import com.sky.properties.ShopProperties;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.utils.HttpClientUtil;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
@@ -44,6 +49,22 @@ public class OrderServiceImpl implements OrderService {
     private UserMapper userMapper;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+    @Autowired
+    private ShopProperties shopProperties;
+    @Autowired
+    private BaiduMapProperties baiduMapProperties;
+    private static final String ADDRESS = "address";
+    private static final String OUTPUT = "output";
+    private static final String OUTPUT_FORMAT = "json";
+    private static final String ORIGIN = "origin";
+    private static final String DESTINATION = "destination";
+    // 骑行种类，0：普通自行车 1：电动自行车
+    private static final String RIDING_TYPE = "riding_type";
+    private static final String BY_BIKE = "0";
+    private static final String BY_ELECTRIC_BICYCLE = "1";
+    // 是否下发具体路线规划
+    private static final String STEPS_INFO = "steps_info";
+    private static final String AK = "ak";
 
     /**
      * 用户下单
@@ -62,6 +83,11 @@ public class OrderServiceImpl implements OrderService {
         if (addressBook == null) {
             throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
         }
+
+        // 判断用户选择的收获地址是否超出配送范围
+        verifyUserAddress(addressBook.getProvinceName() + addressBook.getCityName() +
+                addressBook.getDistrictName() + addressBook.getDetail());
+
         // 获取当前登录用户ID
         Long userId = BaseContext.getCurrentId();
         // 判断用户购物车是否有商品
@@ -516,5 +542,79 @@ public class OrderServiceImpl implements OrderService {
             dishesArrayList.add(dishesTempStr);
         });
         return String.join("",dishesArrayList);
+    }
+
+    /**
+     * 校验用户收获地址，超出范围不配送
+     * @param address
+     * @return void
+     * @author paxi
+     * @data 2023/9/10
+     **/
+    private void verifyUserAddress(String address) {
+        // 首先获得店铺地址的经纬度坐标
+        String shopCoordinate = getCoordinate(shopProperties.getAddress());
+        // 再获得用户订单提交的地址的经纬度坐标
+        String userCoordinate = getCoordinate(address);
+
+        // 计算两地间距离
+        Integer distance = getDistance(shopCoordinate, userCoordinate);
+        if(distance > 5000){
+            //配送距离超过5000米
+            throw new OrderBusinessException(MessageConstant.OUT_OF_DELIVERY_RANGE);
+        }
+    }
+
+    /**
+     * 调用百度地图接口将结构化地址（省/市/区/街道/门牌号）解析为对应的位置坐标
+     * @param address
+     * @return java.lang.String
+     * @author paxi
+     * @data 2023/9/10
+     **/
+    private String getCoordinate(String address) {
+        Map<String,String> params = new HashMap<>();
+        params.put(ADDRESS,address);
+        params.put(OUTPUT,OUTPUT_FORMAT);
+        params.put(AK, baiduMapProperties.getAk());
+        String geocoder = HttpClientUtil.doGet(baiduMapProperties.getWebservice_geocoding_url(), params);
+
+        // 解析数据
+        JSONObject jsonObject = JSON.parseObject(geocoder);
+        if (!jsonObject.getString("status").equals("0")) {
+            throw new OrderBusinessException(MessageConstant.GEOCODING_FAILED);
+        }
+        JSONObject location = jsonObject.getJSONObject("result").getJSONObject("location");
+        // 获取经度信息
+        String lng = location.getString("lng");
+        // 获取纬度信息
+        String lat = location.getString("lat");
+        return lat + "," + lng;
+    }
+
+    /**
+     * 调用百度地图接口根据起终点坐标规划骑行出行路线及距离
+     * @param origin
+     * @param destination
+     * @return java.lang.Integer
+     * @author paxi
+     * @data 2023/9/10
+     **/
+    private Integer getDistance(String origin,String destination) {
+        Map<String,String> params = new HashMap<>();
+        params.put(ORIGIN,origin);
+        params.put(DESTINATION,destination);
+        params.put(RIDING_TYPE,BY_ELECTRIC_BICYCLE);
+        params.put(STEPS_INFO,"0");
+        params.put(AK,baiduMapProperties.getAk());
+
+        String routeStr = HttpClientUtil.doGet(baiduMapProperties.getWebservice_DirectionLite_url(), params);
+        JSONObject jsonObject = JSON.parseObject(routeStr);
+        if (!jsonObject.getString("status").equals("0")) {
+            throw new OrderBusinessException(MessageConstant.ROUTE_PARSING_FAILED);
+        }
+        JSONObject result = jsonObject.getJSONObject("result");
+        JSONArray routes = result.getJSONArray("routes");
+        return (Integer) ((JSONObject) routes.get(0)).get("distance");
     }
 }

@@ -32,5 +32,8 @@ public class MessageConstant {
     public static final String NO_DEFAULT_ADDRESS = "没有查询到默认地址";
     public static final String ORDER_PAID = "该订单已支付";
     public static final String CANCEL_REASON = "用户自助取消";
+    public static final String GEOCODING_FAILED = "地址解析失败";
+    public static final String ROUTE_PARSING_FAILED = "路线解析失败";
+    public static final String OUT_OF_DELIVERY_RANGE = "超出配送范围";
 
 }

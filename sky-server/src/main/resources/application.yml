@@ -54,3 +54,9 @@ sky:
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
+  baidumap:
+    ak: ${sky.baidumap.ak}
+    webservice_geocoding_url: ${sky.baidumap.webservice_geocoding_url}
+    webservice_-direction-lite_url: ${sky.baidumap.webservice_-direction-lite_url}
+  shop:
+    address: ${sky.shop.address}
