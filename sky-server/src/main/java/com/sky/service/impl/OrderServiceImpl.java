@@ -374,7 +374,7 @@ public class OrderServiceImpl implements OrderService {
         Orders ordersDatabase = ordersMapper.getById(ordersRejectionDTO.getId());
 
         // 只有待接单才可以拒单
-        if (ordersDatabase == null || Objects.equals(ordersDatabase.getStatus(), Orders.TO_BE_CONFIRMED)) {
+        if (ordersDatabase == null || !Objects.equals(ordersDatabase.getStatus(), Orders.TO_BE_CONFIRMED)) {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
         // 判断用户支付状态
@@ -560,7 +560,7 @@ public class OrderServiceImpl implements OrderService {
         // 计算两地间距离
         Integer distance = getDistance(shopCoordinate, userCoordinate);
         if(distance > 5000){
-            //配送距离超过5000米
+            // 配送距离超过5000米
             throw new OrderBusinessException(MessageConstant.OUT_OF_DELIVERY_RANGE);
         }
     }

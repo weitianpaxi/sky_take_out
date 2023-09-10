@@ -54,4 +54,15 @@
         from setmeal_dish left join dish on setmeal_dish.dish_id = dish.id
         where setmeal_dish.setmeal_id = #{setmealId}
     </select>
+    <select id="getCount" resultType="java.lang.Integer">
+        select count(id) from setmeal
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
 </mapper>

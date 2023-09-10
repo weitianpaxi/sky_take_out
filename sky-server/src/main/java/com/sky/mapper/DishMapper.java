@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 菜品管理相关数据库操作
@@ -106,4 +107,13 @@ public interface DishMapper {
      * @data 2023/9/4
      **/
     List<Dish> list(Dish dish);
+
+    /**
+     * 根据状态统计数量
+     * @param paramMap
+     * @return java.lang.Integer
+     * @author paxi
+     * @data 2023/9/10
+     **/
+    Integer getCount(Map<String, Integer> paramMap);
 }

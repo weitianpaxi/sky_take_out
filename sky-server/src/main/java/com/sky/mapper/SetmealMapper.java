@@ -12,6 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -98,4 +99,13 @@ public interface SetmealMapper {
      * @data 2023/9/4
      **/
     List<DishItemVO> getDishItemBySetmealId(Long setmealId);
+
+    /**
+     * 根据状态统计数量
+     * @param paramMap
+     * @return java.lang.Integer
+     * @author paxi
+     * @data 2023/9/10
+     **/
+    Integer getCount(Map<String, Integer> paramMap);
 }
