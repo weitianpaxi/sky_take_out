@@ -1,6 +1,7 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
@@ -98,4 +99,14 @@ public interface OrdersMapper {
      **/
     @Select("select * from orders where status = #{status} and order_time < #{time}")
     List<Orders> getByStatusAndOrderTimeLT(Integer status, LocalDateTime time);
+
+    /**
+     * 统计某段时间内商品销量前十的商品名称和数量
+     * @param beginTime
+     * @param endTime
+     * @return java.util.List<com.sky.dto.GoodsSalesDTO>
+     * @author paxi
+     * @data 2023/9/11
+     **/
+    List<GoodsSalesDTO> getGoodsSealTopTen(LocalDateTime beginTime, LocalDateTime endTime);
 }

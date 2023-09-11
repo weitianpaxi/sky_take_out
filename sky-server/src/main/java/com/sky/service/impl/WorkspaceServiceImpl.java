@@ -124,28 +124,28 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         map.put("begin",begin);
         map.put("end",end);
 
-        //查询总订单数
+        // 查询总订单数
         Integer totalOrderCount = ordersMapper.countByMap(map);
 
         map.put("status", Orders.COMPLETED);
-        //营业额
+        // 营业额
         Double turnover = ordersMapper.sumByMap(map);
         turnover = turnover == null? 0.0 : turnover;
 
-        //有效订单数
+        // 有效订单数
         Integer validOrderCount = ordersMapper.countByMap(map);
 
         double unitPrice = 0.0;
 
         double orderCompletionRate = 0.0;
         if(totalOrderCount != 0 && validOrderCount != 0){
-            //订单完成率
+            // 订单完成率
             orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
-            //平均客单价
+            // 平均客单价
             unitPrice = turnover / validOrderCount;
         }
 
-        //新增用户数
+        // 新增用户数
         Integer newUsers = userMapper.countByMap(map);
 
         return BusinessDataVO.builder()
