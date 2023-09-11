@@ -6,6 +6,8 @@ import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Mapper
@@ -85,4 +87,15 @@ public interface OrdersMapper {
      * @data 2023/9/10
      **/
     Double sumByMap(Map<Object, Object> map);
+
+    /**
+     * 根据状态和时间查询订单
+     * @param status
+     * @param time
+     * @return java.util.List<com.sky.entity.Orders>
+     * @author paxi
+     * @data 2023/9/11
+     **/
+    @Select("select * from orders where status = #{status} and order_time < #{time}")
+    List<Orders> getByStatusAndOrderTimeLT(Integer status, LocalDateTime time);
 }

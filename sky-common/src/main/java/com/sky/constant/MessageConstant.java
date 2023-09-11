@@ -35,5 +35,6 @@ public class MessageConstant {
     public static final String GEOCODING_FAILED = "地址解析失败";
     public static final String ROUTE_PARSING_FAILED = "路线解析失败";
     public static final String OUT_OF_DELIVERY_RANGE = "超出配送范围";
+    public static final String ORDER_TIMEOUT = "订单超时，自动取消";
 
 }
