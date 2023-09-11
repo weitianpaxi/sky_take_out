@@ -24,6 +24,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,8 @@ public class OrderServiceImpl implements OrderService {
     private ShopProperties shopProperties;
     @Autowired
     private BaiduMapProperties baiduMapProperties;
+    @Autowired
+    private WebSocketServer webSocketServer;
     private static final String ADDRESS = "address";
     private static final String OUTPUT = "output";
     private static final String OUTPUT_FORMAT = "json";
@@ -65,6 +68,7 @@ public class OrderServiceImpl implements OrderService {
     // 是否下发具体路线规划
     private static final String STEPS_INFO = "steps_info";
     private static final String AK = "ak";
+
 
     /**
      * 用户下单
@@ -207,15 +211,14 @@ public class OrderServiceImpl implements OrderService {
 
         ordersMapper.update(orders);
 
-        /* 以下为利用websocket服务完成用户下单提醒的功能
+        // 以下为利用websocket服务完成用户下单提醒的功能
         Map<Object, Object> hashMap = new HashMap<>();
         // 1.代表来单提醒 2.代表用户催单
         hashMap.put("type",1);
         hashMap.put("orderId",ordersDB.getId());
-        hashMap.put("content","订单号" + outTradeNo);
+        hashMap.put("content","订单号：" + outTradeNo);
 
-        String jsonString = JSON.toJSONString(hashMap);
-        webSocketServer.sendToAllClient(jsonString);*/
+        webSocketServer.sendToAllClient(JSON.toJSONString(hashMap));
 
     }
 
@@ -498,6 +501,30 @@ public class OrderServiceImpl implements OrderService {
         List<OrderVO> orderVOList = getOrdersVOList(ordersPage);
 
         return new PageResult(ordersPage.getTotal(),orderVOList);
+    }
+
+    /**
+     * 通过websocket实现用户催单
+     * @param orderId
+     * @return void
+     * @author paxi
+     * @data 2023/9/11
+     **/
+    @Override
+    public void reminderOrders(Long orderId) {
+        Orders ordersDatabase = ordersMapper.getById(orderId);
+
+        // 校验订单是否存在
+        if (ordersDatabase == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        // 以下为利用websocket服务完成用户催单的功能
+        Map<Object, Object> hashMap = new HashMap<>();
+        // 1.代表来单提醒 2.代表用户催单
+        hashMap.put("type",2);
+        hashMap.put("orderId",orderId);
+        hashMap.put("content","订单号：" + ordersDatabase.getNumber());
+        webSocketServer.sendToAllClient(JSON.toJSONString(hashMap));
     }
 
     /**

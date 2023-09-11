@@ -116,4 +116,19 @@ public class OrderController {
         orderService.userCancelByOrderId(orderId);
         return Result.success();
     }
+
+    /**
+     * 用户催单
+     * @param orderId
+     * @return com.sky.result.Result<java.lang.String>
+     * @author paxi
+     * @data 2023/9/11
+     **/
+    @GetMapping("/reminder/{id}")
+    @ApiOperation(value = "用户催单")
+    public Result<String> reminder(@PathVariable("id") Long orderId) {
+        log.info("用户催促订单号：{}",orderId);
+        orderService.reminderOrders(orderId);
+        return Result.success();
+    }
 }

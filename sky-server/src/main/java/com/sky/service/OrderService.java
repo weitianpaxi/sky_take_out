@@ -135,4 +135,13 @@ public interface OrderService {
      * @data 2023/9/9
      **/
     PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    /**
+     * 通过websocket实现用户催单
+     * @param orderId
+     * @return void
+     * @author paxi
+     * @data 2023/9/11
+     **/
+    void reminderOrders(Long orderId);
 }
