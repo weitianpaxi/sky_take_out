@@ -209,3 +209,6 @@ location / {
 ## 用户端小程序
 
 用户端小程序源码见我另外一个仓库，地址为：https://github.com/weitianpaxi/sky_take_out_applet 已删除微信支付相关功能代码。
+
+# 资源下载
+本项目以及用户端小程序代码全部打包下载链接：链接: https://pan.baidu.com/s/1s4DkWsubp8Szx-IkJJkxSA 提取码: 2333 
