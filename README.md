@@ -195,7 +195,7 @@ mac OS请使用`homebrew`安装`Nginx`后修改`Nginx`的配置文件，其默�
 /opt/homebrew/var/www
 ```
 
-之后修改配置文件中的`location`中``root``项为下：
+之后修改配置文件中的`location`中`root`项为下：
 
 ```yaml
 location / {
@@ -204,7 +204,7 @@ location / {
         }
 ```
 
-之后启动``Nginx`即可，建议使用`nginx -t`命令检查配置文件是否正确。
+之后启动`Nginx`即可，建议使用`nginx -t`命令检查配置文件是否正确。
 
 ## 用户端小程序
 
