@@ -153,7 +153,7 @@ wechat:
 
 ## 百度地图配置
 
-在百度地图开放平台（https://lbsyun.baidu.com/index.php?title=%E9%A6%96%E9%A1%B5）申请到应用后填入如下配置信息：
+在百度地图开放平台（https://lbsyun.baidu.com/index.php?title=%E9%A6%96%E9%A1%B5） 申请到应用后填入如下配置信息：
 
 ```yaml
 baidumap:
