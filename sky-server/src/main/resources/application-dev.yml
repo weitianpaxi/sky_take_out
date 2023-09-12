@@ -1,0 +1,26 @@
+sky:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: mysql服务地址
+    port: mysql服务端口号
+    database: sky_take_out(连接的数据库名称)
+    username: 用户名
+    password: 密码
+  alioss:
+    endpoint: oss-cn-shanghai.aliyuncs.com(在阿里云创建OSS时选择区域后可以得到，这里是上海的URL)
+    access-key-id: 你账户的access-key-id，建议创建使用子账户更安全
+    access-key-secret: 你账户access-key-id对应的密钥，建议创建使用子账户更安全
+    bucket-name: 你创建的bucket的名称
+  redis:
+    host: redis运行的服务地址
+    port: redis服务端口号
+    database: 连接redis的第几号数据库
+  wechat:
+    appid: 小程序ID
+    secret: 小程序ID对应的密钥
+  baidumap:
+    ak: 百度地图创建的应用ak
+    webservice_geocoding_url: https://api.map.baidu.com/geocoding/v3 (地理编码API请求地址)
+    webservice_-direction-lite_url: https://api.map.baidu.com/directionlite/v1/riding (轻量级路线规划骑行路线规划API请求地址)
+  shop:
+    address: 自定义店铺地址
