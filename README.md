@@ -177,7 +177,7 @@ shop:
 
 ## 管理端前端配置
 
-管理端前端打包后可见于`sky_take_out管理端前端运行环境.zip`中，为了使`websocket`协议生效，``Nginx`配置文件中的代理端口请设置为`80`。具体如下图所示：
+管理端前端打包后可见于`sky_take_out管理端前端运行环境.zip`中，为了使`websocket`协议生效，`Nginx`配置文件中的代理端口请设置为`80`。具体如下图所示：
 
 ![image-20230912192501244](https://s2.loli.net/2023/09/12/RQBZfopJ2OLwdK3.png)
 
