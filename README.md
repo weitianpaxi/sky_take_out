@@ -1,5 +1,9 @@
 # 项目效果展示
 
+**管理端在线演示** 👉 [地址](http://project_sky.weitianshu.me/#/login) 
+
+**接口文档在线查看** 👉 [地址](http://sky_apidoc.weitianshu.me/doc.html#/home) 
+
 管理端-外卖商家使用
 
 ![image-20230912162049618](https://s2.loli.net/2023/09/12/T73yWPfqIjcVKxA.png)
